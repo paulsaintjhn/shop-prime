@@ -37,6 +37,15 @@ function ShoppingCartProvider({ children }) {
     }
   }
 
+  function removeProductFromCart(productItem) {
+    const cartItemId = cart.findIndex((item) => item.id === productItem.id);
+    console.log("Index of existing item in cart is", cartItemId);
+
+    cart.splice(cartItemId, 1);
+
+    console.log("Number of items in cart", cart.length);
+  }
+
   function addToCart(productItem) {
     try {
       setCart((prevCart) => {
@@ -69,7 +78,13 @@ function ShoppingCartProvider({ children }) {
     fetchAvailableProducts();
   }, []);
 
-  const value = { fetchedProducts, isFetchingStatus, addToCart, cart };
+  const value = {
+    fetchedProducts,
+    isFetchingStatus,
+    addToCart,
+    cart,
+    removeProductFromCart,
+  };
 
   //   console.log(fetchedProducts);
 

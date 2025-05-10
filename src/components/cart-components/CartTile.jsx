@@ -1,4 +1,9 @@
+import { useContext } from "react";
+import { ShoppingCartContext } from "../../contexts";
+
 function CartTile({ cartItem }) {
+  const { removeProductFromCart } = useContext(ShoppingCartContext);
+
   return (
     <div>
       <div className="flex justify-between">
@@ -11,7 +16,11 @@ function CartTile({ cartItem }) {
           </div>
         </div>
         <div>
-          <img src="/assets/icon-remove-item.svg" alt="Remove item" />
+          <img
+            onClick={() => removeProductFromCart(cartItem)}
+            src="/assets/icon-remove-item.svg"
+            alt="Remove item"
+          />
         </div>
       </div>
     </div>

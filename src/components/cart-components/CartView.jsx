@@ -6,7 +6,7 @@ import { ShoppingCartContext } from "../../contexts";
 function CartView() {
   //   const { cart } = useCart();
 
-  const { cart } = useContext(ShoppingCartContext);
+  const { cart, } = useContext(ShoppingCartContext);
 
   console.log("Items in cart include:", cart);
 
