@@ -38,39 +38,70 @@ function ShoppingCartProvider({ children }) {
   }
 
   function removeProductFromCart(productItem) {
-    const cartItemId = cart.findIndex((item) => item.id === productItem.id);
-    console.log("Index of existing item in cart is", cartItemId);
+    // Filter out the item to be removed
+    const updatedCart = cart.filter((item) => item.id !== productItem.id);
 
-    cart.splice(cartItemId, 1);
+    // Update state
+    setCart(updatedCart);
 
-    console.log("Number of items in cart", cart.length);
+    // Update localStorage
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+    console.log("Removed item with id:", productItem.id);
+    console.log("Updated cart length:", updatedCart.length);
   }
+
+  // function removeProductFromCart(productItem) {
+  //   setCart((prevCart) => {
+  //     const cartItemId = prevCart.findIndex(
+  //       (item) => item.id === productItem.id
+  //     );
+  //     let updatedCart;
+  //     if (cartItemId) {
+  //       updatedCart = prevCart.splice(cartItemId, 1);
+  //     }
+  //     // Save updated cart to localStorage
+  //     localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+  //     return updatedCart;
+  //   });
+
+  //   console.log("Index of existing item in cart is", cartItemId);
+
+  //   console.log("Number of items in cart", updatedCart.length);
+  // }
+  // function removeProductFromCart(productItem) {
+  //   const cartItemId = cart.findIndex((item) => item.id === productItem.id);
+  //   console.log("Index of existing item in cart is", cartItemId);
+
+  //   cart.splice(cartItemId, 1);
+
+  //   console.log("Number of items in cart", cart.length);
+  // }
 
   function addToCart(productItem) {
     try {
-      setCart((prevCart) => {
-        const existingItem = prevCart.find(
-          (item) => item.id === productItem.id
-        );
+      const updatedCart = (() => {
+        const existingItem = cart.find((item) => item.id === productItem.id);
 
-        let updatedCart;
         if (existingItem) {
-          updatedCart = prevCart.map((item) =>
+          return cart.map((item) =>
             item.id === productItem.id
               ? { ...item, quantity: item.quantity + 1 }
               : item
           );
         } else {
-          updatedCart = [...prevCart, { ...productItem, quantity: 1 }];
+          return [...cart, { ...productItem, quantity: 1 }];
         }
+      })();
 
-        // Save updated cart to localStorage
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
+      setCart(updatedCart);
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
 
-        return updatedCart;
-      });
+      console.log("Added to cart:", productItem.name);
     } catch (error) {
-      setCartError("Error occurred while trying to add item to cart", error);
+      console.error("Error occurred while trying to add item to cart:", error);
+      setError("Something went wrong while adding to cart.");
     }
   }
 
