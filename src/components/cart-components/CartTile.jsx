@@ -5,23 +5,21 @@ function CartTile({ cartItem }) {
   const { removeProductFromCart } = useContext(ShoppingCartContext);
 
   return (
-    <div>
-      <div className="flex justify-between">
+    <div className="border-b pb-3">
+      <div className="flex justify-between items-center">
         <div>
-          <p>{cartItem.title}</p>
-          <div className="flex justify-evenly">
-            <p>{cartItem.quantity}x</p>
-            <p>@{cartItem.price}</p>
-            <p></p>
+          <p className="font-medium text-gray-800">{cartItem.title}</p>
+          <div className="flex items-center text-sm text-gray-500 mt-1 space-x-2">
+            <p>{cartItem.quantity}×</p>
+            <p>${cartItem.price.toFixed(2)}</p>
           </div>
         </div>
-        <div>
-          <img
-            onClick={() => removeProductFromCart(cartItem)}
-            src="/assets/icon-remove-item.svg"
-            alt="Remove item"
-          />
-        </div>
+        <button
+          onClick={() => removeProductFromCart(cartItem)}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          ×
+        </button>
       </div>
     </div>
   );

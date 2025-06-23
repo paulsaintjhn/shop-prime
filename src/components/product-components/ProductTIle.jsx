@@ -1,15 +1,26 @@
 import { useContext } from "react";
-import { useCart } from "../../contexts/CartContext";
 import { ShoppingCartContext } from "../../contexts";
+import { useNavigate } from "react-router-dom";
 
 function ProductTile({ product }) {
-  // const { addToCart } = useCart();
-  const { addToCart } = useContext(ShoppingCartContext);
+  const { addToCart, cart, decreaseProductQuantity } =
+    useContext(ShoppingCartContext);
+  const navigate = useNavigate();
+
+  // Check if the product is already in the cart
+  const cartItem = cart.find((item) => item.id === product.id);
+
+  const handleImageClick = () => {
+    navigate(`/product-details/${product.id}`);
+  };
 
   return (
-    <div className="flex flex-col border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow h-full">
-      {/* Image at the top */}
-      <div className="aspect-square bg-gray-100 overflow-hidden">
+    <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+      {/* Image */}
+      <div
+        className="aspect-square overflow-hidden cursor-pointer"
+        onClick={handleImageClick}
+      >
         {product?.thumbnail ? (
           <img
             src={product.thumbnail}
@@ -23,28 +34,43 @@ function ProductTile({ product }) {
         )}
       </div>
 
-      {/* Button at the bottom */}
-      <div className="p-4 pt-0">
-        <button
-          onClick={() => addToCart(product)}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition-colors"
-        >
-          Add to Cart
-        </button>
-      </div>
-
-      {/* Product details in the middle */}
-      <div className="p-4 flex-grow">
-        <h3 className="font-semibold text-lg mb-1">
+      {/* Product Details */}
+      <div className="p-4">
+        <div className="text-sm text-gray-500 mb-1">{product?.category}</div>
+        <h3 className="font-semibold text-lg mb-2 text-gray-800">
           {product?.title || "Untitled Product"}
         </h3>
-        {/* {product?.description && (
-          <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-            {product.description}
-          </p>
-        )} */}
         {product?.price && (
-          <p className="text-lg font-bold mt-2">${product.price.toFixed(2)}</p>
+          <p className="text-lg font-bold text-gray-900">
+            ${product.price.toFixed(2)}
+          </p>
+        )}
+      </div>
+      {/* Add to Cart / Quantity Control Button */}
+      <div className="px-4 pb-4">
+        {cartItem ? (
+          <div className="w-full bg-white border border-gray-300 text-gray-800 py-2 px-4 rounded-full flex items-center justify-between">
+            <button
+              onClick={() => decreaseProductQuantity(product)}
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <span className="text-lg font-bold">-</span>
+            </button>
+            <span className="font-semibold text-lg">{cartItem.quantity}</span>
+            <button
+              onClick={() => addToCart(product)}
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <span className="text-lg font-bold">+</span>
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => addToCart(product)}
+            className="w-full bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 py-2 px-4 rounded-full transition-colors flex items-center justify-center"
+          >
+            <span className="mr-2">Add to Cart</span>
+          </button>
         )}
       </div>
     </div>

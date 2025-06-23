@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 //create the context
 //provide the state to context
@@ -10,12 +11,41 @@ export const ShoppingCartContext = createContext(null);
 function ShoppingCartProvider({ children }) {
   const [isFetchingStatus, setFetchingStatus] = useState(false);
   const [fetchedProducts, setFetchedProducts] = useState([]);
+  const [product, setProduct] = useState(null);
   const [error, setError] = useState("");
   const [cart, setCart] = useState(() => {
     const storedCart = localStorage.getItem("cart");
     return storedCart ? JSON.parse(storedCart) : [];
   });
   const [cartError, setCartError] = useState("");
+  const { id } = useParams();
+
+  // useEffect(() => {
+  //   async function fetchProductDetails() {
+  //     setFetchingStatus(true);
+
+  //     try {
+  //       const response = await fetch(`https://dummyjson.com/products/${id}`);
+  //       const data = await response.json();
+
+  //       if (data && data.id) {
+  //         // Optional chaining replaces && check
+  //         setProduct(data.product);
+  //       } else {
+  //         setError("Product data is missing"); // Add error state
+  //       }
+  //     } catch (e) {
+  //       setError("Failed to fetch product details: " + e.message);
+  //     } finally {
+  //       setFetchingStatus(false);
+  //     }
+  //   }
+
+  //   if (id) {
+  //     fetchProductDetails();
+  //   }
+  // }, [id]);
+
 
   async function fetchAvailableProducts() {
     setFetchingStatus(true);
@@ -37,19 +67,42 @@ function ShoppingCartProvider({ children }) {
     }
   }
 
-  function removeProductFromCart(productItem) {
-    // Filter out the item to be removed
-    const updatedCart = cart.filter((item) => item.id !== productItem.id);
+  function decreaseProductQuantity(productItem) {
+    const updatedCart = cart
+      .map((item) =>
+        item.id === productItem.id
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
+      .filter((item) => item.quantity > 0); // Remove if quantity reaches 0
 
-    // Update state
     setCart(updatedCart);
-
-    // Update localStorage
     localStorage.setItem("cart", JSON.stringify(updatedCart));
 
     console.log("Removed item with id:", productItem.id);
     console.log("Updated cart length:", updatedCart.length);
   }
+
+  function removeProductFromCart(productItem) {
+    const updatedCart = cart.filter((item) => item.id !== productItem.id);
+
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  }
+
+  // function removeProductFromCart(productItem) {
+  //   // Filter out the item to be removed
+  //   const updatedCart = cart.filter((item) => item.id !== productItem.id);
+
+  //   // Update state
+  //   setCart(updatedCart);
+
+  //   // Update localStorage
+  //   localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+  //   console.log("Removed item with id:", productItem.id);
+  //   console.log("Updated cart length:", updatedCart.length);
+  // }
 
   // function removeProductFromCart(productItem) {
   //   setCart((prevCart) => {
@@ -98,11 +151,24 @@ function ShoppingCartProvider({ children }) {
       setCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
 
-      console.log("Added to cart:", productItem.name);
+      console.log("Added to cart:", calculateTotalPrice);
+      console.log("Total amount of items added to cart is:", productItem.name);
     } catch (error) {
       console.error("Error occurred while trying to add item to cart:", error);
       setError("Something went wrong while adding to cart.");
     }
+  }
+
+  function calculateTotalPrice() {
+    return cart.reduce((total, item) => {
+      return total + item.price * item.quantity;
+    }, 0);
+  }
+
+  function calculateTotalItems() {
+    return cart.reduce((total, item) => {
+      return total + item.quantity;
+    }, 0);
   }
 
   useEffect(() => {
@@ -111,10 +177,14 @@ function ShoppingCartProvider({ children }) {
 
   const value = {
     fetchedProducts,
-    isFetchingStatus,
     addToCart,
     cart,
     removeProductFromCart,
+    decreaseProductQuantity,
+    calculateTotalPrice,
+    calculateTotalItems,
+    isFetchingStatus,
+    product,
   };
 
   //   console.log(fetchedProducts);

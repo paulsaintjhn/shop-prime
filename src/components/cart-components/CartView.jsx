@@ -1,36 +1,40 @@
 import { useContext } from "react";
-import { useCart } from "../../contexts/CartContext";
 import CartTile from "./CartTile";
 import { ShoppingCartContext } from "../../contexts";
 
 function CartView() {
-  //   const { cart } = useCart();
-
-  const { cart, } = useContext(ShoppingCartContext);
-
-  console.log("Items in cart include:", cart);
+  const { cart, calculateTotalPrice, calculateTotalItems } = useContext(ShoppingCartContext);
 
   return (
-    <div className="mt-25 bg-white text-gray-400">
-      <div>
-        <h3>Your Cart</h3>
+    <div className="w-1/4 bg-white shadow-md p-6 h-screen sticky top-0 overflow-y-auto">
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Your Cart ({calculateTotalItems()})</h3>
       </div>
 
-      {cart.length > 0 ? (
-        cart.map((cartItem) => (
-          <CartTile key={cartItem.id} cartItem={cartItem} />
-        ))
-      ) : (
-        <p>Your cart is empty. Are you broke??</p>
+      <div className="space-y-4 mb-6">
+        {cart.length > 0 ? (
+          cart.map((cartItem) => (
+            <CartTile key={cartItem.id} cartItem={cartItem} />
+          ))
+        ) : (
+          <p className="text-gray-500">Your cart is empty</p>
+        )}
+      </div>
+
+      {cart.length > 0 && (
+        <div className="border-t pt-4">
+          <div className="flex justify-between mb-4">
+            <p className="font-medium text-gray-700">Order Total:</p>
+            <p className="font-bold text-gray-900">${calculateTotalPrice().toFixed(2)}</p>
+          </div>
+          <button 
+            type="button"
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-md transition-colors font-medium"
+          >
+            Confirm Order
+          </button>
+        </div>
       )}
-
-      <div>
-        <p>Order Total:</p>
-        <p></p>
-      </div>
-      <div>
-        <button type="button">Confirm Order</button>
-      </div>
     </div>
   );
 }
